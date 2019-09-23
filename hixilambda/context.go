@@ -19,3 +19,19 @@ func AwsSessionFromContext(ctx context.Context) (*session.Session, bool) {
 	return sess, ok
 }
 
+type Environments map[string]interface{}
+
+var environmentKey = &key{}
+
+func NewContextWithEnviromnents(parent context.Context, envs Environments) context.Context {
+	return context.WithValue(parent, environmentKey, envs)
+}
+
+func EnviromnetsFromContext(ctx context.Context) (Environments, bool) {
+	envs, ok := ctx.Value(environmentKey).(Environments)
+	return envs, ok
+}
+
+func (e Environments) MustGetString(key string) string {
+	return e[key].(string)
+}
