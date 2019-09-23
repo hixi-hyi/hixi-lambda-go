@@ -13,13 +13,15 @@ import (
 var LocalStackDomain = ""
 
 type Lambda struct {
-	AwsSession *session.Session
-	LogManager *lambdalog.Manager
+	AwsSession   *session.Session
+	LogManager   *lambdalog.Manager
+	Environments Environments
 }
 
 func (l *Lambda) Init() {
 	l.AwsSession = session.Must(session.NewSession())
 	l.LogManager = lambdalog.NewManagerDefault()
+	l.Environments = Environments{}
 
 	if isSamLocal() || isTest() || hasLocalStackDomain() {
 		// In generally, I should not put the code for testing in here.
