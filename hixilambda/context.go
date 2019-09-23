@@ -23,11 +23,11 @@ type Environments map[string]interface{}
 
 var environmentKey = &key{}
 
-func NewContextWithEnviromnents(parent context.Context, envs Environments) context.Context {
+func NewContextWithEnvironments(parent context.Context, envs Environments) context.Context {
 	return context.WithValue(parent, environmentKey, envs)
 }
 
-func EnviromnetsFromContext(ctx context.Context) (Environments, bool) {
+func EnvironmentsFromContext(ctx context.Context) (Environments, bool) {
 	envs, ok := ctx.Value(environmentKey).(Environments)
 	return envs, ok
 }
