@@ -6,9 +6,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
-type key string
+type key int
 
-const sessionKey key = "session"
+const (
+	sessionKey key = iota
+	environmentKey
+)
 
 func NewContextWithAwsSession(parent context.Context, sess *session.Session) context.Context {
 	return context.WithValue(parent, sessionKey, sess)
@@ -20,8 +23,6 @@ func AwsSessionFromContext(ctx context.Context) (*session.Session, bool) {
 }
 
 type Environments map[string]interface{}
-
-const environmentKey key = "environment"
 
 func NewContextWithEnvironments(parent context.Context, envs Environments) context.Context {
 	return context.WithValue(parent, environmentKey, envs)
