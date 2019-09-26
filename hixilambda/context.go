@@ -2,6 +2,9 @@ package hixilambda
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 )
@@ -24,6 +27,10 @@ func AwsSessionFromContext(ctx context.Context) (*session.Session, bool) {
 
 type Environments map[string]interface{}
 
+func NewEnvironments() Environments {
+	return Environments{}
+}
+
 func NewContextWithEnvironments(parent context.Context, envs Environments) context.Context {
 	return context.WithValue(parent, environmentKey, envs)
 }
@@ -34,5 +41,32 @@ func EnvironmentsFromContext(ctx context.Context) (Environments, bool) {
 }
 
 func (e Environments) MustGetString(key string) string {
-	return e[key].(string)
+	got, ok := e[key]
+	if !ok {
+		panic(fmt.Sprintf("key:%s is not set in environments", key))
+	}
+	ret, ok := got.(string)
+	if !ok {
+		panic(fmt.Sprintf("key:%s is not string value: %v", key, got))
+	}
+	return ret
+}
+
+func (e Environments) LoadEnvOnlyPrefix(prefix string) {
+	osenvs := os.Environ()
+	for _, osenv := range osenvs {
+		splits := strings.SplitN(osenv, "=", 2)
+		key := splits[0]
+		value := splits[1]
+		if strings.HasPrefix(key, prefix) {
+			e[key] = value
+		}
+	}
+}
+func (e Environments) MustLoadEnv(key string) {
+	got, ok := os.LookupEnv(key)
+	if !ok {
+		panic(fmt.Sprintf("key:%s does not exist in the environments", key))
+	}
+	e[key] = got
 }
