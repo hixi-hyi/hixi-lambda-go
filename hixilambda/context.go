@@ -31,6 +31,12 @@ func NewEnvironments() Environments {
 	return Environments{}
 }
 
+func NewEnvironmentsFromEnv(prefix string) Environments {
+	e := NewEnvironments()
+	e.LoadEnvOnlyPrefix(prefix)
+	return e
+}
+
 func NewContextWithEnvironments(parent context.Context, envs Environments) context.Context {
 	return context.WithValue(parent, environmentKey, envs)
 }
